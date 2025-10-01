@@ -12,7 +12,7 @@ Proyecto 1: Lenguajes de programación.
 
 #### Ejecución:
 
-`$ ghci __.hs`
+`$ ghci Interp.hs`
 
 ### Dependencias:
 
