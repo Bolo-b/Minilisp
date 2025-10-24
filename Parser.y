@@ -1,6 +1,6 @@
 {
-    module Parser (parse, Expr(...)) where
-    import Lexer (Token(..))
+module Parser (parse, Exp(..)) where
+import Lexer (Token(..))
 }
 
 %name parse
@@ -34,10 +34,11 @@
     or          { TokenOr }
 
     if          { TokenIf }
+    else        { TokenElse}
     cond        { TokenCond }
 
     let         { TokenLet }
-    let*        { TokenLetE }
+    'let*'        { TokenLetE }
 
     fst         { TokenFst }
     snd         { TokenSnd }
@@ -48,33 +49,36 @@
 
 %%
 
-Expr : id                                { IdP $1 }
+Exp : id                                { IdP $1 }
     | int                               { NumP $1 }
     | bool                              { BoolP $1 }
     | '(' '+' Param Param ')'           { AddP $3 $4 }
-    | '(' '-' Param Param ')'           { SubP "-" $3 $4 }
-    | '(' '*' Param Param ')'           { MultP "*" $3 $4 }
-    | '(' '/' Param Param ')'           { DivP "/" $3 $4 }
-    | '(' '=' Param Param ')'           { EqualsP "=" $3 $4 }
-    | '(' '<' Param Param ')'           { LessEP "<" $3 $4 }
-    | '(' '>' Param Param ')'           { GreatEP ">" $3 $4 }
-    | '(' '<=' Param Param ')'          { LessP "<=" $3 $4 }
-    | '(' '>=' Param Param ')'          { GreatP ">=" $3 $4 }
-    | '(' '!=' Param Param ')'          { Diff "!=" $3 $4 }
-    | '(' not Exp ')'                   { BNotP "not" $3 }
-    | '(' and Exp Exp ')'               { BAndP "and" $3 $4 }
-    | '(' or Exp Exp ')'                { BOrP "or" $3 $4 }
+    | '(' '-' Param Param ')'           { SubP $3 $4 }
+    | '(' '*' Param Param ')'           { MultP $3 $4 }
+    | '(' '/' Param Param ')'           { DivP $3 $4 }
+    | '(' '=' Param Param ')'           { EqualsP $3 $4 }
+    | '(' '<' Param Param ')'           { LessEP $3 $4 }
+    | '(' '>' Param Param ')'           { GreatEP $3 $4 }
+    | '(' '<=' Param Param ')'          { LessP $3 $4 }
+    | '(' '>=' Param Param ')'          { GreatP $3 $4 }
+    | '(' '!=' Param Param ')'          { Diff $3 $4 }
+    | '(' not Exp ')'                   { BNotP $3 }
+    | '(' and Exp Exp ')'               { BAndP $3 $4 }
+    | '(' or Exp Exp ')'                { BOrP $3 $4 }
     | '(' if Exp Exp Exp ')'            { IfP $3 $4 $5 }
     | '(' cond Claus '[' else Exp ']' ')'             { CondP $3 $6}
---    | '(' let '(' SustList ')' '(' Exp ')' ')'   { ELet $4 $7 }
---    | '(' let* '(' SustList ')' '(' Exp ')' ')'  { ELetStar $4 $7 }
-    | '(' lambda '(' Param Exp ')' Param ')'     { LambdaP $4 $5 $7 }
+
+--    | '(' let '(' SustList ')' '(' Exp ')' ')'   { FunP $4 $7 }
+--    | '(' let* '(' SustList ')' '(' Exp ')' ')'  { FunRecP $4 $7 }
+
+    | '(' lambda '(' Param ')' '('Param ')' ')'     { LambdaP $4 $7 }
+    | '(' Exp Param ')'                 { AppP $2 $3 } --Aplicación de función variádica
     | '(' Exp ',' Exp ')'               { PairP $2 $4 }
-    | '(' fst Exp ')'                   { FirstP "fst" $3 }
-    | '(' snd Exp ')'                   { FirstP "snd" $3 }
+    | '(' fst Exp ')'                   { FstP $3 }
+    | '(' snd Exp ')'                   { SndP $3 }
     | '[' List ']'                      { ListP $2 }
-    | '(' head Exp ')'                  { HeadLP "head" $3 }
-    | '(' tail Exp ')'                  { TailLP "tail" $3 }
+    | '(' head Exp ')'                  { HeadLP $3 }
+    | '(' tail Exp ')'                  { TailLP $3 }
     | null                              { NullP }
 
 Param : id                              { IdP $1 }
@@ -90,5 +94,42 @@ Claus
     | Claus '[' '(' Exp ')' '(' Exp ')' ']'  { $1 ++ [($4, $7)] }
 
 
-List : Expr                        { [$1] }
-    | Expr ',' ExprList           { $1 : $3 }
+List : Exp                        { [$1] }
+    | Exp ',' List           { $1 : $3 }
+
+
+{
+
+parseError :: [Token] -> a
+parseError _ = error "Parse error"
+
+data Exp = IntP Int
+            | BoolP Bool
+            | IdP String
+            | NullP
+            | AddP Exp Exp
+            | SubP Exp Exp
+            | MultP Exp Exp
+            | DivP Exp Exp
+            | EqualsP Exp Exp
+            | LessEP Exp Exp
+            | GreatEP Exp Exp
+            | LessP Exp Exp
+            | GreatP Exp Exp
+            | Diff Exp Exp
+            | BNotP Exp
+            | BAndP Exp Exp
+            | BOrP Exp Exp
+            | IfP Exp Exp
+            | CondP Exp Exp
+--let y letrec
+            | LambdaP Exp Exp Exp
+            | AppFunct Exp Exp
+            | PairP Exp Exp
+            | FstP Exp
+            | SndP Exp Exp
+            | ListP Exp
+            | HeadLP Exp
+            | TailLP Exp
+            deriving (Show, Eq)
+}
