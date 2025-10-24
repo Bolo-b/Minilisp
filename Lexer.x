@@ -51,8 +51,7 @@ data Token
 %wrapper "basic"
 $digit = 0-9
 $alpha =[a-z]
-\x20 = ' ' (space), \x09 = tab, \x0A = LF, \x0D = CR, \x0C = FF, \x0B = VT
-%white =[\x20\x09\x0A\x0D\X0C\X0B]
+$white = [\x20\x09\x0A\x0D\x0C\x0B]
 tokens:-
 $white+             
 0     {\s -> return(TokenInt(read s))}
