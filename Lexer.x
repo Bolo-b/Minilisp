@@ -2,12 +2,18 @@
 module Lexer(Token(..), lexer) where
 import Data.Char (isSpace)
 }
+
 %wrapper "basic"
+
 $digit = 0-9
-$alpha =[a-z]
+$alpha = [a-zA-z]
+
 $white = [\x20\x09\x0A\x0D\x0C\x0B]
+
 tokens:-
-$white+             
+
+$white+             ;
+
 0     {\s -> (TokenInt(read s))}
 [1-9]$digit* {\s -> (TokenInt(read s)) }
 \-[1-9]$digit* {\s -> (TokenInt(read s))}
@@ -28,11 +34,6 @@ $white+
 \>= {\_ -> TokenMayorEq}
 \!= {\_ -> TokenDiff}
 
-add {\_ -> TokenAdd}
-sub {\_ -> TokenSub}
-sqrt {\_ -> TokenSqrt}
-expt {\_ -> TokenExpt}
-
 not {\_ -> TokenNot}
 and {\_ -> TokenAnd}
 or {\_ -> TokenOr}
@@ -46,7 +47,12 @@ snd {\_ -> TokenSnd}
 head {\_ -> TokenHead}
 tail {\_ -> TokenTail}
 null {\_-> TokenNull}
+else {\_-> TokenElse}
 lambda {\_-> TokenLambda}
+
+[a-z]$alpha*   {\s -> TokenId s}
+
+
 {
 data Token
         = TokenInt Int
@@ -85,6 +91,7 @@ data Token
         |TokenSnd
         |TokenHead
         |TokenTail
+        |TokenElse
         |TokenLambda
         deriving(Show)
         

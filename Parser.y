@@ -84,9 +84,9 @@ Exp : id                                { IdP $1 }
 Param : id                              { IdP $1 }
     | int                               { NumP $1 }
     | bool                              { BoolP $1 }
-    | Param int                         { ParamIntP $1 (EInt $2) }
-    | Param bool                        { ParamBoolP $1 (EBool $2) }
-    | Param id                          { ParamIdP $1 (EId $2) }
+    | Param int                         { ParamNumP $1 (NumP $2) }
+    | Param bool                        { ParamBoolP $1 (BoolP $2) }
+    | Param id                          { ParamIdP $1 (IdP $2) }
     | Exp                               { $1 }
 
 Claus
@@ -103,7 +103,7 @@ List : Exp                        { [$1] }
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
-data Exp = IntP Int
+data Exp = NumP Int
             | BoolP Bool
             | IdP String
             | NullP
@@ -120,15 +120,18 @@ data Exp = IntP Int
             | BNotP Exp
             | BAndP Exp Exp
             | BOrP Exp Exp
-            | IfP Exp Exp
-            | CondP Exp Exp
+            | IfP Exp Exp Exp
+            | CondP [(Exp, Exp)] Exp
 --let y letrec
-            | LambdaP Exp Exp Exp
-            | AppFunct Exp Exp
+            | LambdaP Exp Exp
+            | AppP Exp Exp
+            | ParamNumP (Exp) Exp
+            | ParamBoolP (Exp) Exp
+            | ParamIdP (Exp) Exp
             | PairP Exp Exp
             | FstP Exp
-            | SndP Exp Exp
-            | ListP Exp
+            | SndP Exp
+            | ListP [Exp]
             | HeadLP Exp
             | TailLP Exp
             deriving (Show, Eq)
