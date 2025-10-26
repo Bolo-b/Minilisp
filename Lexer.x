@@ -43,10 +43,12 @@ data Token
             |TokenTail
             |TokenLambda
             deriving(Show)
-            normalizeSpaces :: String -> String
-            normalizeSpaces = map(\c -> if isSpace c then '\x20' else c)
-            lexer :: String -> [Token]
-            lexer = alexScanTokens . normalizeSpaces
+            
+normalizeSpaces :: String -> String
+normalizeSpaces = map(\c -> if isSpace c then '\x20' else c)
+
+lexer :: String -> [Token]
+lexer = alexScanTokens . normalizeSpaces
 }
 %wrapper "basic"
 $digit = 0-9
