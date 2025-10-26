@@ -1,56 +1,8 @@
 {   
-    module Lexer(
-        --Igual depende de la forma en que se implemento el parser
-        Token(..), lexer
-    )where
-    --Empezamos Definiendo los tokens
-data Token
-            = TokenInt Int
-            |TokenBool Bool
-            |TokenId  String
-            |TokenNull
-            |TokenParenL
-            |TokenParenR
-            |TokenBracketR
-            |TokenBracketL
-            |TokenComma
-            --Operaciones
-            |TokenSuma
-            |TokenResta
-            |TokenMult
-            |TokenDiv
-            |TokenEq
-            |TokenAdd
-            |TokenSub
-            |TokenSqrt
-            |TokenExpt
-            |TokenMenor
-            |TokenMayor
-            |TokenMenorEq
-            |TokenMayorEq
-            |TokenDiff
-            |TokenNot
-            |TokenAnd
-            |TokenOr
-            |TokenIf0
-            |TokenIf
-            |TokenCond
-            |TokenLet
-            |TokenLetE
-            |TokenFst
-            |TokenSnd
-            |TokenHead
-            |TokenTail
-            |TokenLambda
-            deriving(Show)
-            
-normalizeSpaces :: String -> String
-normalizeSpaces = map(\c -> if isSpace c then '\x20' else c)
-
-lexer :: String -> [Token]
-lexer = alexScanTokens . normalizeSpaces
+module Lexer(Token(..), lexer) where
+import Data.Char (isSpace)
 }
-%wrapper "basic"
+%wrapper "monad"
 $digit = 0-9
 $alpha =[a-z]
 $white = [\x20\x09\x0A\x0D\x0C\x0B]
@@ -95,3 +47,50 @@ head {\_ -> return TokenHead}
 tail {\_ -> return TokenTail}
 null {\_-> return TokenNull}
 lambda {\_-> return TokenLambda}
+{
+data Token
+        = TokenInt Int
+        |TokenBool Bool
+        |TokenId  String
+        |TokenNull
+        |TokenParenL
+        |TokenParenR
+        |TokenBracketR
+        |TokenBracketL
+        |TokenComma
+        --Operaciones
+        |TokenSuma
+        |TokenResta
+        |TokenMult
+        |TokenDiv
+        |TokenEq
+        |TokenAdd
+        |TokenSub
+        |TokenSqrt
+        |TokenExpt
+        |TokenMenor
+        |TokenMayor
+        |TokenMenorEq
+        |TokenMayorEq
+        |TokenDiff
+        |TokenNot
+        |TokenAnd
+        |TokenOr
+        |TokenIf0
+        |TokenIf
+        |TokenCond
+        |TokenLet
+        |TokenLetE
+        |TokenFst
+        |TokenSnd
+        |TokenHead
+        |TokenTail
+        |TokenLambda
+        deriving(Show)
+        
+normalizeSpaces :: String -> String
+normalizeSpaces = map(\c -> if isSpace c then '\x20' else c)
+
+lexer :: String -> [Token]
+lexer = alexScanTokens . normalizeSpaces
+}
