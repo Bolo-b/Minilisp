@@ -2,51 +2,51 @@
 module Lexer(Token(..), lexer) where
 import Data.Char (isSpace)
 }
-%wrapper "monad"
+%wrapper "basic"
 $digit = 0-9
 $alpha =[a-z]
 $white = [\x20\x09\x0A\x0D\x0C\x0B]
 tokens:-
 $white+             
-0     {\s -> return(TokenInt(read s))}
-[1-9]$digit* {\s ->return (TokenInt(read s)) }
-\-[1-9]$digit* {\s -> return (TokenInt(read s))}
-\#t {\_ -> return (TokenBool True)}
-\#f {\_ -> return (TokenBool False)}
-\(  {\_-> return TokenParenL}
-\)  {\_ ->return TokenParenR}
-\[  {\_ -> return TokenBracketL}
-\]  {\_ -> return TokenBracketR}
-\,  {\_ -> return TokenComma}
-\+  {\_ -> return TokenSuma}
-\*  {\_-> return TokenMult}
-\/  {\_ -> return TokenDiv}
-\=  {\_ ->return TokenEq}
-\<  {\_ ->return TokenMenor}
-\>  {\_ ->return TokenMayor}
-\<= {\_ -> return TokenMenorEq}
-\>= {\_ -> return TokenMayorEq}
-\!= {\_ -> return TokenDiff}
+0     {\s -> (TokenInt(read s))}
+[1-9]$digit* {\s -> (TokenInt(read s)) }
+\-[1-9]$digit* {\s -> (TokenInt(read s))}
+\#t {\_ -> (TokenBool True)}
+\#f {\_ -> (TokenBool False)}
+\(  {\_-> TokenParenL}
+\)  {\_ -> TokenParenR}
+\[  {\_ -> TokenBracketL}
+\]  {\_ -> TokenBracketR}
+\,  {\_ -> TokenComma}
+\+  {\_ -> TokenSuma}
+\*  {\_-> TokenMult}
+\/  {\_ -> TokenDiv}
+\=  {\_ -> TokenEq}
+\<  {\_ -> TokenMenor}
+\>  {\_ -> TokenMayor}
+\<= {\_ -> TokenMenorEq}
+\>= {\_ -> TokenMayorEq}
+\!= {\_ -> TokenDiff}
 
-add {\_ -> return TokenAdd}
-sub {\_ ->return TokenSub}
-sqrt {\_ ->return TokenSqrt}
-expt {\_ ->return TokenExpt}
+add {\_ -> TokenAdd}
+sub {\_ -> TokenSub}
+sqrt {\_ -> TokenSqrt}
+expt {\_ -> TokenExpt}
 
-not {\_ -> return TokenNot}
-and {\_ -> return TokenAnd}
-or {\_ -> return TokenOr}
-if0 {\_ ->return TokenIf0}
-if {\_ -> return TokenIf}
-cond {\_ -> return TokenCond}
-let {\_ -> return TokenLet}
-let\* {\_ -> return TokenLetE}
-fst {\_ -> return TokenFst}
-snd {\_ -> return TokenSnd}
-head {\_ -> return TokenHead}
-tail {\_ -> return TokenTail}
-null {\_-> return TokenNull}
-lambda {\_-> return TokenLambda}
+not {\_ -> TokenNot}
+and {\_ -> TokenAnd}
+or {\_ -> TokenOr}
+if0 {\_ -> TokenIf0}
+if {\_ -> TokenIf}
+cond {\_ -> TokenCond}
+let {\_ -> TokenLet}
+let\* {\_ -> TokenLetE}
+fst {\_ -> TokenFst}
+snd {\_ -> TokenSnd}
+head {\_ -> TokenHead}
+tail {\_ -> TokenTail}
+null {\_-> TokenNull}
+lambda {\_-> TokenLambda}
 {
 data Token
         = TokenInt Int
