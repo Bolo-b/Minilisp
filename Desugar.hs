@@ -37,7 +37,7 @@ desugar (MultP e1 e2) = Mult (desugar e1) (desugar e2)
 desugar (DivP (ParamNumP p1 p2) e1) = Div (Div (desugar p1) (desugar p2)) (desugar e1)
 desugar (DivP e1 e2) = Div (desugar e1) (desugar e2)
 
-desugar (EqualsP e1 e2) = Equals how (desugar e1) (desugar e2)
+desugar (EqualsP e1 e2) = Equals (desugar e1) (desugar e2)
 desugar (LessEP e1 e2) = LessE (desugar e1) (desugar e2)
 desugar (GreatEP e1 e2) = GreatE (desugar e1) (desugar e2)
 desugar (LessP e1 e2) = Less (desugar e1) (desugar e2)
