@@ -25,9 +25,10 @@ $white+             ;
 \]  {\_ -> TokenBracketR}
 \,  {\_ -> TokenComma}
 \+  {\_ -> TokenSuma}
+\-  {\_ -> TokenResta}
 \*  {\_-> TokenMult}
 \/  {\_ -> TokenDiv}
-\=  {\_ -> TokenEq}
+\==  {\_ -> TokenEq}
 \<  {\_ -> TokenMenor}
 \>  {\_ -> TokenMayor}
 \<= {\_ -> TokenMenorEq}
