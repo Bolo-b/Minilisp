@@ -6,6 +6,9 @@ data DesuExp = NumD Int
  | Null
  | Id String
  | Add DesuExp DesuExp
+ | Sub DesuExp DesuExp
+ | Mult DesuExp DesuExp
+ | Div DesuExp DesuExp
  deriving(Show,Eq)
 
 desugar :: Exp -> DesuExp
