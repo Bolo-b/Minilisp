@@ -1,7 +1,19 @@
 module Desugar (desugar) where
-import Parser (Expr(..))
+import Parser (Exp(..))
 
-desugar :: Expr -> Expr
+data DesuExp = NumD Int
+ | Bool Bool
+ | Null
+ | Id 
+ | Add DesuExp DesuExp
+ deriving(Show,Eq)
 
-desugar (IntP n) = IntP n
-desugar (
+desugar :: Exp -> DesuExp
+
+desugar (NumP n) = (NumD n)
+desugar (BoolP b) = (BoolD b)
+desugar (IdP x) = (Id x)
+desugar NullP = NullD
+
+
+
