@@ -6,7 +6,7 @@ import Data.Char (isSpace)
 %wrapper "basic"
 
 $digit = 0-9
-$alpha = [a-zA-z]
+$alpha = [a-zA-Z]
 
 $white = [\x20\x09\x0A\x0D\x0C\x0B]
 

@@ -68,8 +68,8 @@ Exp : id                                { IdP $1 }
     | '(' if Exp Exp Exp ')'            { IfP $3 $4 $5 }
     | '(' cond Claus '[' else Exp ']' ')'             { CondP $3 $6}
 
---    | '(' let '(' SustList ')' '(' Exp ')' ')'   { FunP $4 $7 }
---    | '(' let* '(' SustList ')' '(' Exp ')' ')'  { FunRecP $4 $7 }
+    | '(' let Claus '(' Exp ')' ')'   { FunP $3 $5 }
+    | '(' 'let*' Claus '(' Exp ')' ')'  { FunRecP $3 $5 }
 
     | '(' lambda '(' Param ')' '('Param ')' ')'     { LambdaP $4 $7 }
     | '(' Exp Param ')'                 { AppP $2 $3 } --Aplicación de función variádica
@@ -90,8 +90,8 @@ Param : id                              { IdP $1 }
     | Exp                               { $1 }
 
 Claus
-    : '[' '(' Exp ')' '(' Exp ')' ']'   { [( $3, $6 )] }
-    | Claus '[' '(' Exp ')' '(' Exp ')' ']'  { $1 ++ [($4, $7)] }
+    : '[' Exp Exp ']'         { [($2, $3)] }
+    | Claus '[' Exp Exp ']'   { $1 ++ [($3, $4)] }
 
 
 List : Exp                        { [$1] }
@@ -122,6 +122,8 @@ data Exp = NumP Int
             | BOrP Exp Exp
             | IfP Exp Exp Exp
             | CondP [(Exp, Exp)] Exp
+            | FunP [(Exp, Exp)] Exp
+            | FunRecP [(Exp, Exp)] Exp
 --let y letrec
             | LambdaP Exp Exp
             | AppP Exp Exp
