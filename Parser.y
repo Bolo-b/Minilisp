@@ -78,6 +78,7 @@ Exp : id                                { IdP $1 }
     | '(' fst Exp ')'                   { FstP $3 }
     | '(' snd Exp ')'                   { SndP $3 }
     | '[' List ']'                      { ListP $2 }
+    | '[' ']'        { ListP [] }
     | '(' head Exp ')'                  { HeadLP $3 }
     | '(' tail Exp ')'                  { TailLP $3 }
     | null                              { NullP }
