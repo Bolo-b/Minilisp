@@ -54,9 +54,10 @@ Exp : id                                { IdP $1 }
     | bool                              { BoolP $1 }
     | '(' '+' Param Param ')'           { AddP $3 $4 }
     | '(' '-' Param Param ')'           { SubP $3 $4 }
+    | '(' '-' Exp ')'                   { SubP (NumP 0) $3 }
     | '(' '*' Param Param ')'           { MultP $3 $4 }
     | '(' '/' Param Param ')'           { DivP $3 $4 }
-    | '(' '==' Param Param ')'           { EqualsP $3 $4 }
+    | '(' '==' Param Param ')'          { EqualsP $3 $4 }
     | '(' '<' Param Param ')'           { LessEP $3 $4 }
     | '(' '>' Param Param ')'           { GreatEP $3 $4 }
     | '(' '<=' Param Param ')'          { LessP $3 $4 }
