@@ -53,8 +53,7 @@ Exp : id                                { IdP $1 }
     | int                               { NumP $1 }
     | bool                              { BoolP $1 }
     | '(' '+' Param Param ')'           { AddP $3 $4 }
-    | '(' '-' Param Param ')'           { SubP $3 $4 }
-    | '(' '-' Exp ')'                   { SubP (NumP 0) $3 }
+    | '(' '-' Param ')'                 { SubP $3 }
     | '(' '*' Param Param ')'           { MultP $3 $4 }
     | '(' '/' Param Param ')'           { DivP $3 $4 }
     | '(' '==' Param Param ')'          { EqualsP $3 $4 }
@@ -115,7 +114,7 @@ data Exp = NumP Int
             | IdP String
             | NullP
             | AddP Exp Exp
-            | SubP Exp Exp
+            | SubP Exp
             | MultP Exp Exp
             | DivP Exp Exp
             | EqualsP Exp Exp
