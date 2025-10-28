@@ -14,7 +14,7 @@ data DesuExp = NumD Int
  | GreatE DesuExp DesuExp
  | Less DesuExp DesuExp
  | Great DesuExp DesuExp
- | Diff DesuExp DesuExp
+ | DiffD DesuExp DesuExp
  | Not DesuExp
  | And DesuExp DesuExp
  | Or DesuExp DesuExp
@@ -24,10 +24,10 @@ data DesuExp = NumD Int
 
 desugar :: Exp -> DesuExp
 
-desugar (NumP n) = (NumD n)
-desugar (BoolP b) = (BoolD b)
+desugar (NumP n) = (Num n)
+desugar (BoolP b) = (Bool b)
 desugar (IdP x) = (Id x)
-desugar NullP = NullD
+desugar NullP = Null
 
 desugar (AddP (ParamNumP p1 p2) e1) = Add (Add (desugar p1) (desugar p2)) (desugar e1)
 desugar (AddP e1 e2) = Add (desugar e1) (desugar e2)
@@ -43,7 +43,7 @@ desugar (LessEP e1 e2) = LessE (desugar e1) (desugar e2)
 desugar (GreatEP e1 e2) = GreatE (desugar e1) (desugar e2)
 desugar (LessP e1 e2) = Less (desugar e1) (desugar e2)
 desugar (GreatP e1 e2) = Great (desugar e1) (desugar e2)
-desugar (DiffP e1 e2) = Diff (desugar e1) (desugar e2)
+desugar (Diff e1 e2) = DiffD (desugar e1) (desugar e2)
 
 desugar (BNotP e) = Not (desugar e)
 desugar (BAndP e1 e2) = And (desugar e1) (desugar e2)
