@@ -18,6 +18,7 @@ data DesuExp = NumD Int
  | Not DesuExp
  | And DesuExp DesuExp
  | Or DesuExp DesuExp
+ | If DesuExp DesuExp DesuExp
  |
  deriving(Show,Eq)
 
@@ -47,6 +48,9 @@ desugar (DiffP e1 e2) = Diff (desugar e1) (desugar e2)
 desugar (BNotP e) = Not (desugar e)
 desugar (BAndP e1 e2) = And (desugar e1) (desugar e2)
 desugar (BOrP e1 e2) = Or (desugar e1) (desugar e2)
+
+desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
+desugar (Cond
 
 
 
