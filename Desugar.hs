@@ -21,6 +21,11 @@ data DesuExp = NumD Int
  | Or DesuExp DesuExp
  | If DesuExp DesuExp DesuExp
  | Lambda String DesuExp
+ | Pair DesuExp DesuExp
+ | Fst DesuExp
+ | Snd DesuExp
+ | HeadL DesuExp
+ | TailL DesuExp
  deriving(Show,Eq)
 
 desugar :: Exp -> DesuExp
