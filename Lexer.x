@@ -42,7 +42,7 @@ if0 {\_ -> TokenIf0}
 if {\_ -> TokenIf}
 cond {\_ -> TokenCond}
 let {\_ -> TokenLet}
-let\* {\_ -> TokenLetE}
+letE {\_ -> TokenLetE}
 letrec {\_ -> TokenLetRec}
 fst {\_ -> TokenFst}
 snd {\_ -> TokenSnd}
