@@ -39,7 +39,7 @@ import Lexer (lexer, Token(..))
 
     let         { TokenLet }
     'let*'        { TokenLetE }
-    letrec      { TokenLet }
+    letrec      { TokenLetRec }
 
     fst         { TokenFst }
     snd         { TokenSnd }
