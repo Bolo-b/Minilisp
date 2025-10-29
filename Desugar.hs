@@ -1,4 +1,4 @@
-module Desugar (desugar) where
+module Desugar (desugar, DesuExp(..)) where
 import Parser (parse, Exp(..))
 import Lexer (lexer, Token(..))
 
