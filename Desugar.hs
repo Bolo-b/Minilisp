@@ -20,6 +20,7 @@ data DesuExp = NumD Int
  | Or DesuExp DesuExp
  | If DesuExp DesuExp DesuExp
  |
+ | Lambda String DesuExp
  deriving(Show,Eq)
 
 desugar :: Exp -> DesuExp
@@ -52,5 +53,7 @@ desugar (BOrP e1 e2) = Or (desugar e1) (desugar e2)
 desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
 desugar (Cond
 
+desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e) 
+desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
 
