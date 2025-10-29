@@ -52,6 +52,9 @@ desugar (BAndP e1 e2) = And (desugar e1) (desugar e2)
 desugar (BOrP e1 e2) = Or (desugar e1) (desugar e2)
 
 desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
+desugar (CondP [(c, t)] e) = If (desugar c) (desugar t) (desugar e)
+desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e))
+
 
 desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
