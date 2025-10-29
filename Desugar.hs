@@ -32,6 +32,7 @@ desugar NullP = Null
 
 desugar (AddP (ParamNumP p1 p2) e1) = Add (Add (desugar p1) (desugar p2)) (desugar e1)
 desugar (AddP e1 e2) = Add (desugar e1) (desugar e2)
+desugar (SubP (ParamNumP (ParamNumP p1 p2) e1)) = Sub (Sub (desugar p1) (desugar p2)) (desugar e1)
 desugar (SubP (ParamNumP p1 p2)) = Sub (desugar p1) (desugar p2)
 desugar (SubP p1) = Sub (NumD 0) (desugar p1)
 desugar (MultP (ParamNumP p1 p2) e1) = Mult (Mult (desugar p1) (desugar p2)) (desugar e1)
