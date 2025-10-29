@@ -6,6 +6,8 @@ type Env = [(String, Value)]
 data Value = NumV Int
         | BoolV Bool
         | ClosureV [Value]
+        | ListV [Value]
+        | PairV (Value, Value)
         | Error String
         deriving(Show,Eq)
 
@@ -17,3 +19,8 @@ interp :: DesuExp -> Env -> Value
 interp (NumD n) _ = NumV n
 interp (Bool b) _ = BoolV b
 interp (Id i) e = busca i e
+--Operaciones aritméticas
+
+--lets
+
+--Listas y pares ordenados
