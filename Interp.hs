@@ -10,8 +10,8 @@ data Value = NumV Int
         deriving(Show,Eq)
 
 busca :: String -> Env -> Value
-busca id [] = Error "Variable libre"
-busca id [(x, value):xs] = if id == x then value else busca id xs
+busca id [] = Error ("Variable libre: " ++ id)
+busca id ((i,v):xs) = if id == i then v else busca id xs
 
 interp :: DesuExp -> Env -> Value
 interp (NumD n) _ = NumV n
