@@ -1,5 +1,6 @@
 module Desugar (desugar) where
-import Parser (Exp(..))
+import Parser (parse, Exp(..))
+import Lexer (lexer, Token(..))
 
 data DesuExp = NumD Int
  | Bool Bool
@@ -19,21 +20,20 @@ data DesuExp = NumD Int
  | And DesuExp DesuExp
  | Or DesuExp DesuExp
  | If DesuExp DesuExp DesuExp
- |
  | Lambda String DesuExp
  deriving(Show,Eq)
 
 desugar :: Exp -> DesuExp
 
-desugar (NumP n) = (Num n)
-desugar (BoolP b) = (Bool b)
-desugar (IdP x) = (Id x)
+desugar (NumP n) = NumD n
+desugar (BoolP b) = Bool b
+desugar (IdP x) = Id x
 desugar NullP = Null
 
 desugar (AddP (ParamNumP p1 p2) e1) = Add (Add (desugar p1) (desugar p2)) (desugar e1)
 desugar (AddP e1 e2) = Add (desugar e1) (desugar e2)
-desugar (SubP (ParamNumP p1 p2) e1) = Sub (Sub (desugar p1) (desugar p2)) (desugar e1)
-desugar (SubP e1 e2) = Sub (desugar e1) (desugar e2)
+desugar (SubP (ParamNumP p1 p2)) = Sub (desugar p1) (desugar p2)
+desugar (SubP p1) = Sub (NumD 0) (desugar p1)
 desugar (MultP (ParamNumP p1 p2) e1) = Mult (Mult (desugar p1) (desugar p2)) (desugar e1)
 desugar (MultP e1 e2) = Mult (desugar e1) (desugar e2)
 desugar (DivP (ParamNumP p1 p2) e1) = Div (Div (desugar p1) (desugar p2)) (desugar e1)
@@ -51,9 +51,8 @@ desugar (BAndP e1 e2) = And (desugar e1) (desugar e2)
 desugar (BOrP e1 e2) = Or (desugar e1) (desugar e2)
 
 desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
-desugar (Cond
 
-desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e) 
+desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
 
