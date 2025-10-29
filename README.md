@@ -26,6 +26,6 @@ Proyecto 1: Lenguajes de programación.
 
 ### Dependencias:
 
-[_Happy__](<https://haskell-happy.readthedocs.io/en/latest/>) Compatible con GHC >= 7.0.
+[__Happy__](<https://haskell-happy.readthedocs.io/en/latest/>) Compatible con GHC >= 7.0.
 
-[_Alex__](<https://haskell-alex.readthedocs.io/en/latest/>) Compatible con GHC >= 7.0.
+[__Alex__](<https://haskell-alex.readthedocs.io/en/latest/>) Compatible con GHC >= 7.0.
