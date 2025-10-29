@@ -39,6 +39,7 @@ import Lexer (lexer, Token(..))
 
     let         { TokenLet }
     'let*'        { TokenLetE }
+    letrec      { TokenLet }
 
     fst         { TokenFst }
     snd         { TokenSnd }
@@ -69,7 +70,8 @@ Exp : id                                { IdP $1 }
     | '(' cond Claus '[' else Exp ']' ')'             { CondP $3 $6}
 
     | '(' let '(' Sust ')' Exp ')'   { FunP $4 $6 }
-    | '(' 'let*' '(' Sust ')' Exp ')'  { FunRecP $4 $6 }
+    | '(' 'let*' '(' Sust ')' Exp ')'  { FunPE $4 $6 }
+    | '(' letrec '(' Sust ')' Exp ')'   { FunRecP $4 $6 }
 
     | '(' lambda '(' Param ')' Exp ')'     { LambdaP $4 $6 }
     | '(' Exp Param ')'                 { AppP $2 $3 } --Aplicación de función variádica
@@ -129,6 +131,7 @@ data Exp = NumP Int
             | IfP Exp Exp Exp
             | CondP [(Exp, Exp)] Exp
             | FunP [(Exp, Exp)] Exp
+            | FunPE [(Exp, Exp)] Exp
             | FunRecP [(Exp, Exp)] Exp
 --let y letrec
             | LambdaP Exp Exp
