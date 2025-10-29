@@ -65,4 +65,11 @@ desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e)
 desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
+desugar (PairP e1 e2) = Pair (desugar e1) (desugar e2)
+desugar (FstP e) = Fst (desugar e)
+desugar (SndP e) = Snd (desugar e)
+
+desugar (HeadLP e) = HeadL (desugar e)
+desugar (TailLP e) = TailL (desugar e)
+
 
