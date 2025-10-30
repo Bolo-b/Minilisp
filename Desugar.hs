@@ -65,13 +65,13 @@ desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
 desugar (CondP [(c, t)] e) = If (desugar c) (desugar t) (desugar e)
 desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e))
 
-desugar (FunP [(IdP i, v)] e) = App (Lambda (Id i) (desugar e)) (desugar v)
-desugar (FunP ((IdP i, v):xs) e) = App (Lambda (Id i) (desugar (FunP xs e))) (desugar v)
+desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
+desugar (FunP ((IdP i, v):xs) e) = App (Lambda ( i) (desugar (FunP xs e))) (desugar v)
 
-desugar (FunPE [(IdP i, v)] e) = App (Lambda (Id i) (desugar e)) (desugar v)
+desugar (FunPE [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
 desugar (FunPE ((IdP i, v):xs) e) = desugar (FunPE xs (FunP [(IdP i, v)] e))
 
-desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (Id f) (desugar e)) (Fix (Lambda (Id f) (desugar e1)))
+desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (f) (desugar e)) (Fix (Lambda (f) (desugar e1)))
 
 desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
 desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)

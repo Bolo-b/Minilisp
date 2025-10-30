@@ -97,7 +97,7 @@ bstep(App (Lambda p b)a)
         |esValor a = sust b p a
         |otherwise =App(Lambda p b) (bstep a)
 bstep(App f a)= App(bstep f)a
-bstep (Fix (Lambda x e)) = subst (x, Fix (Lambda x e)) e
+bstep (Fix (Lambda x e)) = sust e x (Fix (Lambda x e)) 
 bstep (Fix e) = Fix (bstep e)
 bstep(Pair e1 e2)
         |not (esValor e1) = Pair (bstep e1 ) e2
