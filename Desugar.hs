@@ -27,6 +27,7 @@ data DesuExp = Num Int
  | Snd DesuExp
  | HeadL DesuExp
  | TailL DesuExp
+ | Fix DesuExp
  deriving(Show,Eq)
 
 desugar :: Exp -> DesuExp
@@ -67,9 +68,12 @@ desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e)
 desugar (FunP [(IdP i, v)] e) = App (Lambda (Id i) (desugar e)) (desugar v)
 desugar (FunP ((IdP i, v):xs) e) = App (Lambda (Id i) (desugar (FunP xs e))) (desugar v)
 
--- let* secuencial
 desugar (FunPE [(IdP i, v)] e) = App (Lambda (Id i) (desugar e)) (desugar v)
 desugar (FunPE ((IdP i, v):xs) e) = desugar (FunPE xs (FunP [(IdP i, v)] e))
+
+desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (Id f) (desugar e)) (Fix (Lambda (Id f) (desugar e1)))
+
+desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
 
 desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
