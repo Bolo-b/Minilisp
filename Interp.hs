@@ -60,7 +60,7 @@ Bstep (Mult (Num n1) n2)= Mult (Num n1)(Bstep n2)
 Bstep (Mult e1 e2)= Mult (Bstep e1)e2
 
 BStep (Div (Num n1) (Num 0)) = error"No se puede dividir por cero"
-BStep (Div (Num n1) (Num n2)) = Num (n1 `/` n2)
+BStep (Div (Num n1) (Num n2)) = Num (n1 `Div` n2)
 BStep (Div (Num n1) e2) = Div (Num n1) (BStep e2)
 BStep (Div e1 e2) = Div (BStep e1) e2
 

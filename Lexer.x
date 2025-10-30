@@ -8,7 +8,7 @@ import Data.Char (isSpace)
 $digit = 0-9
 $alpha = [a-zA-Z]
 
-$white = [\x20\x09/ //\x0A\x0D\x0C\x0B]
+$white = [\x20\x09\x0A\x0D\x0C\x0B]
 
 tokens:-
 
@@ -43,6 +43,7 @@ if {\_ -> TokenIf}
 cond {\_ -> TokenCond}
 let {\_ -> TokenLet}
 let\* {\_ -> TokenLetE}
+letrec {\_ -> TokenLetRec}
 fst {\_ -> TokenFst}
 snd {\_ -> TokenSnd}
 head {\_ -> TokenHead}
@@ -88,6 +89,7 @@ data Token
         |TokenCond
         |TokenLet
         |TokenLetE
+        |TokenLetRec
         |TokenFst
         |TokenSnd
         |TokenHead
