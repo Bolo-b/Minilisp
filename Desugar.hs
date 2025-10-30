@@ -20,7 +20,7 @@ data DesuExp = Num Int
  | And DesuExp DesuExp
  | Or DesuExp DesuExp
  | If DesuExp DesuExp DesuExp
- | Lambda DesuExp DesuExp
+ | Lambda String DesuExp
  | App DesuExp DesuExp
  | Pair DesuExp DesuExp
  | Fst DesuExp
@@ -64,10 +64,12 @@ desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
 desugar (CondP [(c, t)] e) = If (desugar c) (desugar t) (desugar e)
 desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e))
 
-desugar (FunP [(IdP i, v)] e) = App (Lambda (Id i) (desugar e)) (desugar v)
-desugar (FunP ((IdP i, v):xs) e) = App (Lambda (Id i) (desugar (FunP xs e) )) (desugar v)
+desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
+desugar (FunP ((IdP i, v):xs) e) = App (Lambda (i) (desugar (FunP xs e) )) (desugar v)
 
-desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
+--desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
+--Idea para que funcione Lambda en e interp especificamente en sust
+desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
 desugar (AppP f v) = App (desugar f) (desugar v)
