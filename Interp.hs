@@ -6,62 +6,156 @@ data Value = NumV Int
         | BoolV Bool
         | ClosureV [Value]
         | NullV
-        | IdP String
-        | AddP Exp Exp
-        | SubP Exp Exp
-        | MultP Exp Exp
-        | DivP Exp Exp
-        | EqualsP Exp Exp
-        | LessEP Exp Exp
-        | GreatP Exp Exp
-        | Diff Exp Exp
-        | BNotP Exp
-        | BorP Exp Exp
-        | IfP Exp Exp Exp
-      --| LetP String Exp Exp
-      --| LambdaP String Exp
-        | AppP Exp Exp
+        | IdV String
+        | AddV Exp Exp
+        | SubV Exp Exp
+        | MultV Exp Exp
+        | DivV Exp Exp
+        | EqualsV Exp Exp
+        | LessEV Exp Exp
+        | GreatV Exp Exp
+        | DiffDV Exp Exp
+        | BNotV Exp
+        | BorV Exp Exp
+        | IfV Exp Exp Exp
+      --| LetV String Exp Exp
+      --| LambdaV String Exp
+        | AppV Exp Exp
         | Error String
         deriving(Show,Eq)
 busca :: String -> DS -> Value
 busca s MtDS = Error "Free variable: "
 busca s2 (D s1 val sig_ds) = if s1==s2 then val else busca s2 sig_ds
 interp :: DesuExp -> DS -> Value
-interp (Num n) ds = NumV n
-interp (Bool b) ds = BoolV b
+interp (Num n) ds = Num n
+interp (Bool b) ds = Bool b
 interp (Id i) ds = busca i ds
+
+
+esValor::Exp -> Bool
+esValor (Num _) = True
+esValor (Bool _) = True
+esValor Null = True
+esValor (Lambda _ _)= True
+esValor(Pair e1 e2)= (esValor e1)&&(esValor e2)
+esValor _= False
+eval::Exp-> Exp
+eval e
+        |esValor e=e
+        |otherwise = eval(Bstep e)
+
+Bstep:: Exp-> Exp
+Bstep e | esValor e=e
+Bstep (Id e) = error("Error")
+Bstep (Add (Num n1) (Num))= Num(n1+ n2)
+Bstep (Add (Num n1) e2)= Add (Num n1) (Bstep e2)
+Bstep (Add e1 e2) = Add(Bstep e1)e2
+
+Bstep (Sub (Num n1)(Num n2))= Num(n1-n2)
+Bstep (Sub (Num n1) n2)= Sub (Num n1)(Bstep n2)
+Bstep (Sub e1 e2)= Sub (Bstep e1)e2
+
+Bstep (Mult (Num n1)(Num n2))= Num(n1*n2)
+Bstep (Mult (Num n1) n2)= Mult (Num n1)(Bstep n2)
+Bstep (Mult e1 e2)= Mult (Bstep e1)e2
+
+BStep (Div (Num n1) (Num 0)) = error"No se puede dividir por cero"
+BStep (Div (Num n1) (Num n2)) = Num (n1 `/` n2)
+BStep (Div (Num n1) e2) = Div (Num n1) (BStep e2)
+BStep (Div e1 e2) = Div (BStep e1) e2
+
+Bstep (Sub (Num n1)(Num n2))= Num(n1-n2)
+Bstep (Sub (Num n1) n2)= Sub (Num n1)(Bstep n2)
+Bstep (Sub e1 e2)= Sub (Bstep e1)e2
+
+Bstep (Equals e1 e2)
+        |not (esValor e1)= Equals(Bstep e1) e2
+        | esValor && not (esValor e2)= Equals e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1==n2)
+Bstep (LessE e1 e2)
+        |not (esValor e1)= LessE(Bstep e1) e2
+        | esValor && not (esValor e2)=LessE e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1<n2)
+Bstep (GreatE e1 e2)
+        |not (esValor e1)= GreatE(Bstep e1) e2
+        | esValor && not (esValor e2)= GreatE e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1>n2)
+Bstep (Less e1 e2)
+        |not (esValor e1)= Less(Bstep e1) e2
+        | esValor && not (esValor e2)= Less e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1<=n2)
+Bstep (Great e1 e2)
+        |not (esValor e1)= Great(Bstep e1) e2
+        | esValor && not (esValor e2)= Great e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1>=n2)
+Bstep (DiffD e1 e2)
+        |not (esValor e1)= DiffD(Bstep e1) e2
+        | esValor && not (esValor e2)= DiffD e1(Bstep e2)
+        | otherwise = case (e1, e2) of
+                (Num n1, Num n2)-> Bool(n1!=n2)
+Bstep(Not(Bool b))= Bool(not b)
+Bstep(Not e)= Not(Bstep e)
+Bstep(And (Bool False)_)= Bool False
+Bstep(And (Bool True)e2)= e2
+Bstep(And e1 e2)= And (Bstep e1) e2
+Bstep(Or(Bool True)_)= Or True
+Bstep(Or (Bool True)e2)= e2
+Bstep(Or e1 e2)= Or(Bstep e1) e2
+Bstep(If(Bool True)t _)= t
+Bstep(If(Bool False)_ e)= e
+BStep(If c t e)= If(Bstep c) t e
+Bstep(App (Lambda p b)a)
+        |esValor a= sust b p a
+        |otherwise =App(Lambda p b) (Bstep a)
+Bstep(App f a)= App(BStep f)a
+Bstep(Pair e1 e2)
+        |not (esValor e1)= Pair(esValor e1 )e2
+        |esValor e1 && not (esValor e2 )= Pair e1 (Bstep e2)
+        |otherwise =e
+Bstep(Fst(Pair v1 v2)) | esValor(Pair v1 v2 )=v1
+Bstep(Fst e)= Fst(Bstep e)
+Bstep(Snd(Pair v1 v2)) | esValor(Pairv1 v2)= v2
+Bstep(Snd e )= Snd(BStep e)
+--Por si hay un error
+Bstep e = error("Bstep fallo en la implementacion de"++ show e)
+
+
 --Recibe una expresion, un identificador, una expresion y devuelve una expresion
 --Entonces sustituye en este arbol llamado tal por este valor
 sust :: Exp-> String-> Exp-> Exp
-sust(NumV n) _  _= NumP n
-sust(BoolV b) _  _= BoolP b 
-sust NullV _  _ = NullV
-sust(IdP s) var val = if s == var then val else (IdP s)
-sust(AddP e1 e2) var val= AddP (sust e1 var val ) (sust e2 var val)
-sust(SubP e1 e2) var val = SubP(sust e1 var val) (sust e2 var val)
-sust(MultP e1 e2) var val =MultP(sust e1 var val) (sust e2 var val)
-sust(DivP e1 e2) var val = DivP(sust e1 var val) (sust e2 var val)
-sust(EqualsP e1 e2) var val = EqualsP(sust e1 var val)(sust e2 var val)
-sust(LessEP e1 e2) var val = LessEP(sust e1 var val)(sust e2 var val)
-sust(GreatP e1 e2) var val =  GreatP sust(sust e1 var val)( sust e2 var val)
-sust(Diff e1 e2) var val = Diff(sust e1 var val)(sust e2 var val)
-sust(BNotP e1) var val = BNotP(e1 var val)
-sust(BAndP e1 e2) var val= BAndP(sust e1 var val)(sust e2 var val)
-sust(BOrP e1 e2) var val= BorP(sust e1 var val)(sust e2 var val)
-sust(SubP e) var val = SubP (sust e var val)
-sust(IfP c t e) var val= IfP (sust c var val) (sust t var val) (sust e var val)
-sust(AppP f a) var val= AddP (sust f var val) (sust a var val)
-sust(PairP e1 e2 ) var val = PairP(sust e1 var val) (sust e2 var val)
-sust(FstP e) var val = FstP (sust e var val)
-sust(SndP e) var val = SndP (sust e var val)
-sust(ListP exps) var val = ListP --???
-sust(HeadLP e) var val = HeadLP(sust e var val)
-sust(TailLP e) var val = TailLP(sust e var val)
---Falta Lambda,FunP,FunRecP y Lista
-
---Para ver que error Sale
+sust(Num n) _  _= Num n
+sust(Bool b) _  _= Bool b 
+sust Null _  _ = Null
+sust(Id s) var val = if s == var then val else (Id s)
+sust(Add e1 e2) var val= Add (sust e1 var val ) (sust e2 var val)
+sust(Sub e1 e2) var val = Sub(sust e1 var val) (sust e2 var val)
+sust(Mult e1 e2) var val =Mult(sust e1 var val) (sust e2 var val)
+sust(Div e1 e2) var val = Div(sust e1 var val) (sust e2 var val)
+sust(Equals e1 e2) var val = Equals(sust e1 var val)(sust e2 var val)
+sust(LessE e1 e2) var val = LessE(sust e1 var val)(sust e2 var val)
+sust(Great e1 e2) var val =  Great sust(sust e1 var val)( sust e2 var val)
+sust(DiffD e1 e2) var val = DiffD(sust e1 var val)(sust e2 var val)
+sust(Not e1) var val = Not(e1 var val)
+sust(And e1 e2) var val= And(sust e1 var val)(sust e2 var val)
+sust(Or e1 e2) var val= Or(sust e1 var val)(sust e2 var val)
+sust(Sub e) var val = Sub (sust e var val)
+sust(If c t e) var val= If (sust c var val) (sust t var val) (sust e var val)
+sust(App f a) var val= Add (sust f var val) (sust a var val)
+sust(Pair e1 e2 ) var val = Pair(sust e1 var val) (sust e2 var val)
+sust(Fst e) var val = Fst (sust e var val)
+sust(Snd e) var val = Snd (sust e var val)
+sust(HeadL e) var val = HeadL(sust e var val)
+sust(TailL e) var val = TailL(sust e var val)
+sust(Lambda p c) i v =
+        if i == p
+        then Lambda p c
+        else Lambda (sust c i v)
+sust(App f a) i v = App (sust f i v)(sust a i v)
+--Para ver que error sale
 sust e _ _ = error ("Fallo o falta en la implementacion de:"++ show e)
-
-
-
-evalPP:: 
+--Dudas con el Value
