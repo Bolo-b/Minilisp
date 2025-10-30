@@ -19,8 +19,14 @@ interp :: DesuExp -> Env -> Value
 interp (NumD n) _ = NumV n
 interp (Bool b) _ = BoolV b
 interp (Id i) e = busca i e
---Operaciones aritméticas
-
---lets
-
---Listas y pares ordenados
+ esValor::Exp -> Bool
+esValor (Num _) = True
+esValor (Bool _) = True
+esValor Null = True
+esValor (Lambda _ _)= True
+esValor(Pair e1 e2)= (esValor e1)&&(esValor e2)
+esValor _= False
+eval::Exp-> Exp
+eval e
+        |esValor e=e
+        |otherwise = eval(Bstep e)
