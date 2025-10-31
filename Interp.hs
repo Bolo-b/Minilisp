@@ -131,12 +131,14 @@ sust(And e1 e2) var val= And(sust e1 var val)(sust e2 var val)
 sust(Or e1 e2) var val= Or(sust e1 var val)(sust e2 var val)
 
 sust(If c t e) var val= If (sust c var val) (sust t var val) (sust e var val)
-sust(App f a) var val= Add (sust f var val) (sust a var val)
+sust(App f a) var val= App (sust f var val) (sust a var val)
 sust(Pair e1 e2 ) var val = Pair(sust e1 var val) (sust e2 var val)
 sust(Fst e) var val = Fst (sust e var val)
 sust(Snd e) var val = Snd (sust e var val)
 sust(HeadL e) var val = HeadL(sust e var val)
 sust(TailL e) var val = TailL(sust e var val)
+
+sust(Fix e )var val = Fix (sust e var val)
 sust(Lambda p c) i v =
         if i == p
         then Lambda p c

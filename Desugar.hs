@@ -83,9 +83,11 @@ desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
 desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
 desugar (AppP f v) = App (desugar f) (desugar v)
-
-desugar (HeadLP e) = HeadL (desugar e)
-desugar (TailLP e) = TailL (desugar e)
+--Primeras ideas par List
+desugar (ListP [])= Null
+desugar (ListP(x:cs ))= Pair (desugar x) (desugar(ListP cs))
+desugar (HeadLP e) = Fst (desugar e)
+desugar (TailLP e) = Snd (desugar e) 
 
 desugar (PairP e1 e2) = Pair (desugar e1) (desugar e2)
 desugar (FstP e) = Fst (desugar e)
