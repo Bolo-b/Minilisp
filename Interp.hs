@@ -27,7 +27,7 @@ eval e
 
 bstep:: DesuExp -> DesuExp
 bstep e | esValor e=e
-bstep (Id e) = error "Error"
+bstep (Id e) = error "Error en el ID"
 bstep (Add (Num n1) (Num n2))= Num(n1+ n2)
 bstep (Add (Num n1) e2)= Add (Num n1) (bstep e2)
 bstep (Add e1 e2) = Add(bstep e1)e2
@@ -81,6 +81,7 @@ bstep(And (Bool False)_)= Bool False
 bstep(And (Bool True)e2)= e2
 bstep(And e1 e2)= And (bstep e1) e2
 bstep(Or(Bool True)_)= Bool True
+bstep(Or(Bool False)e2)= e2
 bstep(Or e1 e2)= Or(bstep e1) e2
 bstep(If(Bool True)t _)= t
 bstep(If(Bool False)_ e)= e
@@ -96,8 +97,10 @@ bstep(Pair e1 e2)
         |esValor e1 && not (esValor e2 ) = Pair e1 (bstep e2)
         |otherwise = (Pair e1 e2)
 bstep(Fst(Pair v1 v2)) | esValor(Pair v1 v2 )=v1
+bstep(Fst Null)= error "Error: No se puede hacer con una lista vacia"
 bstep(Fst e)= Fst(bstep e)
 bstep(Snd(Pair v1 v2)) | esValor(Pair v1 v2)= v2
+bstep(Snd Null)= error "Error: No se puede hacer con una lista vacia"
 bstep(Snd e )= Snd(bstep e)
 bstep(HeadL e)
         | not (esValor e )= HeadL( bstep e)
