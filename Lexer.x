@@ -8,7 +8,7 @@ import Data.Char (isSpace)
 $digit = 0-9
 $alpha = [a-zA-Z]
 
-$white = [\x20\x09\x0A\x0D\x0C\x0B]
+$white = [\ \t\n\r\f\v]
 
 tokens:-
 
@@ -38,7 +38,6 @@ $white+             ;
 not {\_ -> TokenNot}
 and {\_ -> TokenAnd}
 or {\_ -> TokenOr}
-if0 {\_ -> TokenIf0}
 if {\_ -> TokenIf}
 cond {\_ -> TokenCond}
 let {\_ -> TokenLet}
@@ -74,8 +73,6 @@ data Token
         |TokenEq
         |TokenAdd
         |TokenSub
-        |TokenSqrt
-        |TokenExpt
         |TokenMenor
         |TokenMayor
         |TokenMenorEq
@@ -99,8 +96,7 @@ data Token
         deriving(Show)
         
 normalizeSpaces :: String -> String
-normalizeSpaces = map(\c -> if isSpace c then '\x20' else c)
-
+normalizeSpaces = unwords . words . map (\c -> if isSpace c then ' ' else c)
 lexer :: String -> [Token]
 lexer = alexScanTokens . normalizeSpaces
 }

@@ -87,17 +87,22 @@ Exp : id                                { IdP $1 }
 
 ClausList : '[' Exp Exp ']'               { [($2, $3)] }
           | ClausList '[' Exp Exp ']'     { $1 ++ [($3, $4)] }
+
 SustBinding: '(' id Exp ')'     { ($2,$3) }
+
 SustList:   SustBinding     { [$1] }
         |   SustList SustBinding    { $1 ++ [$2] }
+
 List : ExpList                        { $1 }
 
 IdList : id                         { [$1] }
         | IdList id                 { $1 ++ [$2] }
+
 ExpList : Exp                     { [$1] }
         | ExpList Exp             { $1 ++ [$2] }
+
 ExpList2 : Exp Exp                { [$1, $2] }
-        | ExpList2 Exp           { $1 ++ [$2] }
+        |  ExpList2 Exp           { $1 ++ [$2] }
 {
 
 parseError :: [Token] -> a
