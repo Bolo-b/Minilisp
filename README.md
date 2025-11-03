@@ -22,7 +22,7 @@ Proyecto 1: Lenguajes de programación.
 
 ### Ejecución:
 
-`$ ghci MiniLisp.hs`
+`$ runghc MiniLisp.hs`
 
 ### Dependencias:
 
