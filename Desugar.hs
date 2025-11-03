@@ -74,8 +74,8 @@ desugar (FunPE ((IdP i, v):xs) e) = desugar (FunPE xs (FunP [(IdP i, v)] e))
 desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (f) (desugar e)) (Fix (Lambda (f) (desugar e1)))
 
 desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
-desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
-desugar (FunP ((IdP i, v):xs) e) = App (Lambda (i) (desugar (FunP xs e) )) (desugar v)
+--desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
+--desugar (FunP ((IdP i, v):xs) e) = App (Lambda (i) (desugar (FunP xs e) )) (desugar v)
 
 --desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
 --Idea para que funcione Lambda en e interp especificamente en sust

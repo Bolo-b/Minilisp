@@ -1,24 +1,16 @@
-module Interp where
-import Desugar (desugar, DesuExp(..))
+module Interp (eval, DesuExp(..))where
+import Desugar (DesuExp(..))
 
 type Env = [(String, Value)]
 
 data Value = NumV Int
         | BoolV Bool
-        | ClosureV [Value]
+        | ClosureV String DesuExp Env
         | ListV [Value]
-        | PairV (Value, Value)
+        | PairV Value Value
+        | NullV
         | Error String
         deriving(Show,Eq)
-
-busca :: String -> Env -> Value
-busca id [] = Error ("Variable libre: " ++ id)
-busca id ((i,v):xs) = if id == i then v else busca id xs
-
-interp :: DesuExp -> Env -> Value
-interp (Num n) _ = NumV n
-interp (Bool b) _ = BoolV b
-interp (Id i) e = busca i e
 
 esValor:: DesuExp -> Bool
 esValor (Num _) = True
@@ -107,6 +99,18 @@ bstep(Fst(Pair v1 v2)) | esValor(Pair v1 v2 )=v1
 bstep(Fst e)= Fst(bstep e)
 bstep(Snd(Pair v1 v2)) | esValor(Pair v1 v2)= v2
 bstep(Snd e )= Snd(bstep e)
+bstep(HeadL e)
+        | not (esValor e )= HeadL( bstep e)
+        |otherwise=case e of
+                (Pair v1 _)->v1
+                Null -> error "Cabeza de una lista vacia"
+                _-> error "Error al aplicar cabeza"
+bstep(TailL e)
+        | not (esValor e )= TailL( bstep e)
+        |otherwise=case e of
+                (Pair _ v2)->v2
+                Null -> error "Cabeza de una lista vacia"
+                _-> error "Error al aplicar cabeza"
 --Por si hay un error
 bstep e = error("bstep fallo en la implementacion de"++ show e)
 
@@ -124,6 +128,8 @@ sust(Mult e1 e2) var val =Mult(sust e1 var val) (sust e2 var val)
 sust(Div e1 e2) var val = Div(sust e1 var val) (sust e2 var val)
 sust(Equals e1 e2) var val = Equals(sust e1 var val)(sust e2 var val)
 sust(LessE e1 e2) var val = LessE(sust e1 var val)(sust e2 var val)
+sust(GreatE e1 e2) var val = GreatE (sust e1 var val) (sust e2 var val)
+sust(Less e1 e2) var val = Less (sust e1 var val) (sust e2 var val)
 sust(Great e1 e2) var val =  Great (sust e1 var val)( sust e2 var val)
 sust(DiffD e1 e2) var val = DiffD(sust e1 var val)(sust e2 var val)
 sust(Not e1) var val = Not( sust e1 var val)
@@ -144,6 +150,4 @@ sust(Lambda p c) i v =
         then Lambda p c
         else Lambda p (sust c i v)
 
---Para ver que error sale
-sust e _ _ = error ("Fallo o falta en la implementacion de:"++ show e)
---Dudas con el Value
+   
