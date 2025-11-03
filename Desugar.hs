@@ -36,53 +36,55 @@ desugar (NumP n) = (Num n)
 desugar (BoolP b) = (Bool b)
 desugar (IdP x) = (Id x)
 desugar NullP = Null
+desugar (NegP e)= Sub(Num 0)(desugar e)
+--Se necesita hacer modificacion a lo que tenemos
+desugar (AddP exps) = desugarVariadico Add exps
 
-desugar (AddP (ParamNumP p1 p2) e1) = Add (desugar(AddP p1 p2)) (desugar e1)
-desugar (AddP e1 e2) = Add (desugar e1) (desugar e2)
+desugar (SubP exps) = desugarVariadico Sub exps
 
-desugar (SubP (ParamNumP (ParamNumP p1 p2) e)) = Add (desugar (SubP (ParamNumP p1 p2))) (desugar (SubP e))
-desugar (SubP (ParamNumP p1 p2)) = Add (desugar p1) (desugar (SubP p2))
-desugar (SubP e1) = Sub (Num 0) (desugar e1)
+desugar (MultP exps) = desugarVariadico Mult exps
 
-desugar (MultP (ParamNumP p1 p2) e1) = Mult (desugar(MultP p1 p2)) (desugar e1)
-desugar (MultP e1 e2) = Mult (desugar e1) (desugar e2)
+desugar (DivP exps) =  desugarVariadico Div exps
 
-desugar (DivP (ParamNumP p1 p2) e1) = Div (desugar(DivP p1 p2)) (desugar e1)
-desugar (DivP e1 e2) = Div (desugar e1) (desugar e2)
-
-desugar (EqualsP e1 e2) = Equals (desugar e1) (desugar e2)
-desugar (LessEP e1 e2) = LessE (desugar e1) (desugar e2)
-desugar (GreatEP e1 e2) = GreatE (desugar e1) (desugar e2)
-desugar (LessP e1 e2) = Less (desugar e1) (desugar e2)
-desugar (GreatP e1 e2) = Great (desugar e1) (desugar e2)
-desugar (Diff e1 e2) = DiffD (desugar e1) (desugar e2)
+desugar (EqualsP exps) = desugarVariadico Equals exps
+desugar (LessEP exps) = desugarVariadico LessE exps
+desugar (GreatEP exps) = desugarVariadico GreatE exps
+desugar (LessP exps) =  desugarVariadico Less exps
+desugar (GreatP exps) = desugarVariadico Great exps
+desugar (DiffP exps) = desugarVariadico DiffD exps
 
 desugar (BNotP e) = Not (desugar e)
 desugar (BAndP e1 e2) = And (desugar e1) (desugar e2)
 desugar (BOrP e1 e2) = Or (desugar e1) (desugar e2)
 
 desugar (IfP c t e) = If (desugar c) (desugar t) (desugar e)
-desugar (CondP [(c, t)] e) = If (desugar c) (desugar t) (desugar e)
+desugar (CondP [] e) = desugar e
 desugar (CondP ((c, t):xs) e) = If (desugar c) (desugar t) (desugar (CondP xs e))
 
-desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
-desugar (FunP ((IdP i, v):xs) e) = App (Lambda ( i) (desugar (FunP xs e))) (desugar v)
+desugar (FunP b body)=
+    let
+        vars = map fst b
+        vals = map desugar (map snd b)
+        lambda = desugar (LambdaP vars body)
+    in
+        foldl App lambda vals
+desugar (FunPE [] e)= desugar e
+desugar (FunPE(( i, v):xs) e)=
+    App (Lambda i (desugar (FunPE xs e))) (desugar v)
+desugar (FunRecP [] e) = desugar e
+desugar (FunRecP ((var,val):xs)e)=
+    App(Lambda var (desugar(FunRecP xs e))) (Fix (Lambda var (desugar val)))
 
-desugar (FunPE [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
-desugar (FunPE ((IdP i, v):xs) e) = desugar (FunPE xs (FunP [(IdP i, v)] e))
-
-desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (f) (desugar e)) (Fix (Lambda (f) (desugar e1)))
-
-desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
+--desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (f) (desugar e)) (Fix (Lambda (f) (desugar e1)))
+--desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
 --desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
 --desugar (FunP ((IdP i, v):xs) e) = App (Lambda (i) (desugar (FunP xs e) )) (desugar v)
-
 --desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
---Idea para que funcione Lambda en e interp especificamente en sust
-desugar (LambdaP (IdP i) e) = Lambda i (desugar e)
-desugar (LambdaP (ParamIdP p1 (IdP i)) e) = desugar (LambdaP p1 (LambdaP (IdP i) e))
 
-desugar (AppP f v) = App (desugar f) (desugar v)
+desugar (LambdaP [p] body) = Lambda p (desugar body)
+desugar (LambdaP (p:ps) body) = Lambda p (desugar (LambdaP ps body))
+desugar (LambdaP [] _)= error"Lambda sin parametros"
+desugar (AppP f args) =  foldl App (desugar f) ( map desugar args)
 --Primeras ideas par List
 desugar (ListP [])= Null
 desugar (ListP(x:cs ))= Pair (desugar x) (desugar(ListP cs))
@@ -92,3 +94,10 @@ desugar (TailLP e) = Snd (desugar e)
 desugar (PairP e1 e2) = Pair (desugar e1) (desugar e2)
 desugar (FstP e) = Fst (desugar e)
 desugar (SndP e) = Snd (desugar e)
+desugarVariadico:: (DesuExp -> DesuExp-> DesuExp)-> [Exp]-> DesuExp
+desugarVariadico op exps =
+    let desugar_exps = map desugar exps
+    in case desugar_exps of
+        (e1:e2:es)-> foldl op (op e1 e2) es
+        [e]->e
+        []-> error "Fallo el desugarVariadico"

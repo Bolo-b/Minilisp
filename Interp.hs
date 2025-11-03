@@ -2,7 +2,6 @@ module Interp (eval, DesuExp(..))where
 import Desugar (DesuExp(..))
 
 type Env = [(String, Value)]
-
 data Value = NumV Int
         | BoolV Bool
         | ClosureV String DesuExp Env
