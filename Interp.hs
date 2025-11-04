@@ -1,7 +1,9 @@
+--Modulo Interprete
 module Interp (eval, DesuExp(..))where
 import Desugar (DesuExp(..))
-
+--Tipo para representar el ambiente de evaluacion
 type Env = [(String, Value)]
+--Para rpersentar valores
 data Value = NumV Int
         | BoolV Bool
         | ClosureV String DesuExp Env
@@ -10,7 +12,7 @@ data Value = NumV Int
         | NullV
         | Error String
         deriving(Show,Eq)
-
+--Funcion  para determinar si una expresion es un valor
 esValor:: DesuExp -> Bool
 esValor (Num _) = True
 esValor (Bool _) = True
@@ -19,11 +21,12 @@ esValor (Lambda _ _)= True
 esValor(Pair e1 e2)= esValor e1 && esValor e2
 esValor _= False
 
+--Funcion de evaluacion principal
 eval::DesuExp -> DesuExp
 eval e
         |esValor e=e
         |otherwise = eval(bstep e)
-
+--Funcion de small-step
 bstep:: DesuExp -> DesuExp
 bstep e | esValor e=e
 bstep (Id e) = error "Error en el ID"
