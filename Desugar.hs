@@ -1,5 +1,4 @@
---Modulo Desugar para Minilisp
-odule Desugar (desugar, DesuExp(..)) where
+module Desugar (desugar, DesuExp(..)) where
 import Parser (parse, Exp(..))
 import Lexer (lexer, Token(..))
 --Definicion del nucleo

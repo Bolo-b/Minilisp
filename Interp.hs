@@ -1,4 +1,3 @@
---Modulo Interprete
 module Interp (eval, DesuExp(..))where
 import Desugar (DesuExp(..))
 --Tipo para representar el ambiente de evaluacion
@@ -23,7 +22,7 @@ esValor _= False
 
 --Funcion de evaluacion principal
 eval::DesuExp -> DesuExp
-eval e
+eval e--Modulo Interprete
         |esValor e=e
         |otherwise = eval(bstep e)
 --Funcion de small-step
@@ -101,15 +100,14 @@ bstep(Pair e1 e2)
 bstep(Fst e)
         | not (esValor e)=Fst(bstep e)
         |otherwise = case e of
-                (Pai v1 v2)-> v1
+                (Pair v1 v2)-> v1
                 Null-> error"No se pudo obtener fst"
-                _->"Se esperaba un par ordenado"
+                
 bstep(Snd e)
         | not (esValor e)=Snd(bstep e)
         |otherwise = case e of
-                (Pai v1 v2)-> v2
+                (Pair v1 v2)-> v2
                 Null-> error"No se pudo obtener snd"
-                _->"Se esperaba un par ordenado"
 bstep(HeadL e)
         | not (esValor e )= HeadL( bstep e)
         |otherwise=case e of
