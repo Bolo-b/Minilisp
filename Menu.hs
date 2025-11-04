@@ -1,41 +1,64 @@
 module Menu where
 
-import Interp (runString)
+import MiniLisp (run)
 import System.IO (hFlush, stdout)
-import GHC.IO.FD (stdout)
-import GHC.ResponseFile (expandResponse)
+import System.Exit (exitSuccess)
+import Control.Exception (try, SomeException)
 
-menu :: IO
+menu :: IO ()
 menu = do
-    putStrLn "----------MINILISP----------"
-    menu
-
-menu :: IO
-menu = do
-    putStrLn "\n ----MENU----"
+    putStrLn "\n ==== MINILISP ===="
     putStrLn "1) Agrega una expresión"
     putStrLn "2) Suma de los primeros n naturales"
     putStrLn "3) Factorial"
     putStrLn "4) Fibonacci"
     putStrLn "5) Map"
     putStrLn "6) Filter"
-    putStrLn "7) Casos de prueba"
-    putStrLn "8) Salir"
-    putStr "Selecciona el número: " >> hFlush stdout
+    putStrLn "7) Salir"
+    putStr "Selecciona el número: "
+    hFlush stdout
     opt <- getLine
     case opt of
-        "1" -> do
-            putStrLn "Escribe una expresión en sintaxis concreta: "
-            putStr ">>> " hFlush stdout
-            expr <- getLine
-            putStrLn "\n --- Resultado ---"
-            runString expandResponse
-            menu
+        "1" -> agregaExpr
         "2" -> menuSumaNat
         "3" -> menuFact
         "4" -> menuFibo
         "5" -> menuMap
         "6" -> menuFilter
-        "7" -> menuCasos
-        "8" -> putStrLn "Salir..."
-        _   -> putStrLn "Inválido.\n" >> menu
+        "7" -> do putStrLn "Saliendo..."
+                    exitSuccess
+        _   -> do putStrLn "Inválido.\n"
+                    menu
+
+--Agregar expresión
+agregaExpr :: IO ()
+agregaExpr = do
+    putStr "Minilisp>"
+    hFlush stdout
+    input <- getLine
+    if input == ":q"
+      then menu
+      else do
+        result <- try (return (run input)) :: IO (Either SomeException String)
+        case result of
+            Left ex  -> putStrLn ("Error: " ++ show ex)
+            Right val -> putStrLn val
+        agregaExpr
+
+--Suma de los primeros n naturales
+menuSumaNat :: IO ()
+menuSumaNat = do
+    putStr "n = "
+    hFlush stdout
+    n <- getLine
+    let prog = "(letrec ((suma (lambda(n)(if (== n 0) 0 (+ n (suma (- n 1))))))) (suma " ++ n ++ "))"
+    printResult prog
+
+--Factorial
+menuFact :: IO ()
+menuFact = do
+    putStr "n = "
+    hFlush stdout
+    n <- getLine
+    let prog = "(letrec ((fact (lambda(n) (if (== n 0) 1 (* n (fact (- n 1))))))) (fact " ++ n ++" ))"
+    printResult
