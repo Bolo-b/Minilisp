@@ -1,17 +1,25 @@
-module Interp (eval, DesuExp(..))where
-import Desugar (DesuExp(..))
---Tipo para representar el ambiente de evaluacion
+module Interp where
+import Desugar (desugar, DesuExp(..))
+
 type Env = [(String, Value)]
---Para rpersentar valores
+
 data Value = NumV Int
         | BoolV Bool
-        | ClosureV String DesuExp Env
+        | ClosureV [Value]
         | ListV [Value]
-        | PairV Value Value
-        | NullV
+        | PairV (Value, Value)
         | Error String
         deriving(Show,Eq)
---Funcion  para determinar si una expresion es un valor
+
+busca :: String -> Env -> Value
+busca id [] = Error ("Variable libre: " ++ id)
+busca id ((i,v):xs) = if id == i then v else busca id xs
+
+interp :: DesuExp -> Env -> Value
+interp (Num n) _ = NumV n
+interp (Bool b) _ = BoolV b
+interp (Id i) e = busca i e
+
 esValor:: DesuExp -> Bool
 esValor (Num _) = True
 esValor (Bool _) = True
@@ -20,15 +28,14 @@ esValor (Lambda _ _)= True
 esValor(Pair e1 e2)= esValor e1 && esValor e2
 esValor _= False
 
---Funcion de evaluacion principal
 eval::DesuExp -> DesuExp
-eval e--Modulo Interprete
+eval e
         |esValor e=e
         |otherwise = eval(bstep e)
---Funcion de small-step
+
 bstep:: DesuExp -> DesuExp
 bstep e | esValor e=e
-bstep (Id e) = error "Error en el ID"
+bstep (Id e) = error "Error"
 bstep (Add (Num n1) (Num n2))= Num(n1+ n2)
 bstep (Add (Num n1) e2)= Add (Num n1) (bstep e2)
 bstep (Add e1 e2) = Add(bstep e1)e2
@@ -67,8 +74,8 @@ bstep (Less e1 e2)
         | otherwise = case (e1, e2) of
                 (Num n1, Num n2)-> Bool(n1<=n2)
 bstep (Great e1 e2)
-        |not (esValor e1)= Great(bstep e1) e2
         | (esValor e1) && not (esValor e2)= Great e1(bstep e2)
+        | not (esValor e1)= Great(bstep e1) e2
         | otherwise = case (e1, e2) of
                 (Num n1, Num n2)-> Bool(n1>=n2)
 bstep (DiffD e1 e2)
@@ -82,7 +89,6 @@ bstep(And (Bool False)_)= Bool False
 bstep(And (Bool True)e2)= e2
 bstep(And e1 e2)= And (bstep e1) e2
 bstep(Or(Bool True)_)= Bool True
-bstep(Or(Bool False)e2)= e2
 bstep(Or e1 e2)= Or(bstep e1) e2
 bstep(If(Bool True)t _)= t
 bstep(If(Bool False)_ e)= e
@@ -97,29 +103,10 @@ bstep(Pair e1 e2)
         |not (esValor e1) = Pair (bstep e1 ) e2
         |esValor e1 && not (esValor e2 ) = Pair e1 (bstep e2)
         |otherwise = (Pair e1 e2)
-bstep(Fst e)
-        | not (esValor e)=Fst(bstep e)
-        |otherwise = case e of
-                (Pair v1 v2)-> v1
-                Null-> error"No se pudo obtener fst"
-                
-bstep(Snd e)
-        | not (esValor e)=Snd(bstep e)
-        |otherwise = case e of
-                (Pair v1 v2)-> v2
-                Null-> error"No se pudo obtener snd"
-bstep(HeadL e)
-        | not (esValor e )= HeadL( bstep e)
-        |otherwise=case e of
-                (Pair v1 _)->v1
-                Null -> error "Cabeza de una lista vacia"
-                _-> error "Se esperaba una lista"
-bstep(TailL e)
-        | not (esValor e )= TailL( bstep e)
-        |otherwise=case e of
-                (Pair _ v2)->v2
-                Null -> error "Cabeza de una lista vacia"
-                _-> error "Se esperaba una lista"
+bstep(Fst(Pair v1 v2)) | esValor(Pair v1 v2 )=v1
+bstep(Fst e)= Fst(bstep e)
+bstep(Snd(Pair v1 v2)) | esValor(Pair v1 v2)= v2
+bstep(Snd e )= Snd(bstep e)
 --Por si hay un error
 bstep e = error("bstep fallo en la implementacion de"++ show e)
 
@@ -137,8 +124,6 @@ sust(Mult e1 e2) var val =Mult(sust e1 var val) (sust e2 var val)
 sust(Div e1 e2) var val = Div(sust e1 var val) (sust e2 var val)
 sust(Equals e1 e2) var val = Equals(sust e1 var val)(sust e2 var val)
 sust(LessE e1 e2) var val = LessE(sust e1 var val)(sust e2 var val)
-sust(GreatE e1 e2) var val = GreatE (sust e1 var val) (sust e2 var val)
-sust(Less e1 e2) var val = Less (sust e1 var val) (sust e2 var val)
 sust(Great e1 e2) var val =  Great (sust e1 var val)( sust e2 var val)
 sust(DiffD e1 e2) var val = DiffD(sust e1 var val)(sust e2 var val)
 sust(Not e1) var val = Not( sust e1 var val)
@@ -146,17 +131,17 @@ sust(And e1 e2) var val= And(sust e1 var val)(sust e2 var val)
 sust(Or e1 e2) var val= Or(sust e1 var val)(sust e2 var val)
 
 sust(If c t e) var val= If (sust c var val) (sust t var val) (sust e var val)
-sust(App f a) var val= App (sust f var val) (sust a var val)
+sust(App f a) var val= Add (sust f var val) (sust a var val)
 sust(Pair e1 e2 ) var val = Pair(sust e1 var val) (sust e2 var val)
 sust(Fst e) var val = Fst (sust e var val)
 sust(Snd e) var val = Snd (sust e var val)
 sust(HeadL e) var val = HeadL(sust e var val)
 sust(TailL e) var val = TailL(sust e var val)
-
-sust(Fix e )var val = Fix (sust e var val)
 sust(Lambda p c) i v =
         if i == p
         then Lambda p c
         else Lambda p (sust c i v)
 
-   
+--Para ver que error sale
+sust e _ _ = error ("Fallo o falta en la implementacion de:"++ show e)
+--Dudas con el Value
