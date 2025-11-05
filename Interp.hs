@@ -1,9 +1,7 @@
---Modulo Interprete
 module Interp (eval, DesuExp(..))where
 import Desugar (DesuExp(..))
---Tipo para representar el ambiente de evaluacion
+
 type Env = [(String, Value)]
---Para rpersentar valores
 data Value = NumV Int
         | BoolV Bool
         | ClosureV String DesuExp Env
@@ -12,7 +10,7 @@ data Value = NumV Int
         | NullV
         | Error String
         deriving(Show,Eq)
---Funcion  para determinar si una expresion es un valor
+
 esValor:: DesuExp -> Bool
 esValor (Num _) = True
 esValor (Bool _) = True
@@ -21,12 +19,11 @@ esValor (Lambda _ _)= True
 esValor(Pair e1 e2)= esValor e1 && esValor e2
 esValor _= False
 
---Funcion de evaluacion principal
 eval::DesuExp -> DesuExp
 eval e
         |esValor e=e
         |otherwise = eval(bstep e)
---Funcion de small-step
+
 bstep:: DesuExp -> DesuExp
 bstep e | esValor e=e
 bstep (Id e) = error "Error en el ID"
@@ -98,28 +95,24 @@ bstep(Pair e1 e2)
         |not (esValor e1) = Pair (bstep e1 ) e2
         |esValor e1 && not (esValor e2 ) = Pair e1 (bstep e2)
         |otherwise = (Pair e1 e2)
-bstep(Fst e)
-        | not (esValor e)=Fst(bstep e)
-        |otherwise = case e of
-                (Pai v1 v2)-> v1
-                Null-> error"No se pudo obtener fst"
-bstep(Snd e)
-        | not (esValor e)=Snd(bstep e)
-        |otherwise = case e of
-                (Pai v1 v2)-> v2
-                Null-> error"No se pudo obtener snd"
+bstep(Fst(Pair v1 v2)) | esValor(Pair v1 v2 )=v1
+bstep(Fst Null)= error "Error: No se puede hacer con una lista vacia"
+bstep(Fst e)= Fst(bstep e)
+bstep(Snd(Pair v1 v2)) | esValor(Pair v1 v2)= v2
+bstep(Snd Null)= error "Error: No se puede hacer con una lista vacia"
+bstep(Snd e )= Snd(bstep e)
 bstep(HeadL e)
         | not (esValor e )= HeadL( bstep e)
         |otherwise=case e of
                 (Pair v1 _)->v1
                 Null -> error "Cabeza de una lista vacia"
-                _-> error "Se esperaba una lista"
+                _-> error "Error al aplicar cabeza"
 bstep(TailL e)
         | not (esValor e )= TailL( bstep e)
         |otherwise=case e of
                 (Pair _ v2)->v2
                 Null -> error "Cabeza de una lista vacia"
-                _-> error "Se esperaba una lista"
+                _-> error "Error al aplicar cabeza"
 --Por si hay un error
 bstep e = error("bstep fallo en la implementacion de"++ show e)
 
@@ -158,5 +151,3 @@ sust(Lambda p c) i v =
         if i == p
         then Lambda p c
         else Lambda p (sust c i v)
-
-   
