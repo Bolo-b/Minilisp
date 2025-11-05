@@ -23,7 +23,13 @@ Proyecto 1: Lenguajes de programación.
 ### Ejecución:
 
 `$ runghc MiniLisp.hs`
+### Para el buen funcionamiento de las pruebas se debe tener en cuenta lo siguiente:
+-Cada aplicación de función debe tener ( ) completos
 
+-Usar lambdas multiparamétricas cuando sea posible
+-Verificar que todos los ( tengan su ) correspondiente          
+-Let para dependencias secuenciales, Let para paralelas*
+-Las listas pueden usar comas o espacios entre elementos
 ### Dependencias:
 
 [__Happy__](<https://haskell-happy.readthedocs.io/en/latest/>) Compatible con GHC >= 7.0.
