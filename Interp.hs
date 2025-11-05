@@ -103,13 +103,11 @@ bstep(Fst e)
         |otherwise = case e of
                 (Pai v1 v2)-> v1
                 Null-> error"No se pudo obtener fst"
-                _->"Se esperaba un par ordenado"
 bstep(Snd e)
         | not (esValor e)=Snd(bstep e)
         |otherwise = case e of
                 (Pai v1 v2)-> v2
                 Null-> error"No se pudo obtener snd"
-                _->"Se esperaba un par ordenado"
 bstep(HeadL e)
         | not (esValor e )= HeadL( bstep e)
         |otherwise=case e of
