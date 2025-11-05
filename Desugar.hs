@@ -1,8 +1,7 @@
---Modulo Desugar para Minilisp
 module Desugar (desugar, DesuExp(..)) where
 import Parser (parse, Exp(..))
 import Lexer (lexer, Token(..))
---Definicion del nucleo
+
 data DesuExp = Num Int
  | Bool Bool
  | Null
@@ -31,14 +30,14 @@ data DesuExp = Num Int
  | Fix DesuExp
  deriving(Show,Eq)
 
---Funcion principal de desazucarizacion
 desugar :: Exp -> DesuExp
---Caso base
+
 desugar (NumP n) = (Num n)
 desugar (BoolP b) = (Bool b)
 desugar (IdP x) = (Id x)
 desugar NullP = Null
 desugar (NegP e)= Sub(Num 0)(desugar e)
+--Se necesita hacer modificacion a lo que tenemos
 desugar (AddP exps) = desugarVariadico Add exps
 
 desugar (SubP exps) = desugarVariadico Sub exps
@@ -75,6 +74,13 @@ desugar (FunPE(( i, v):xs) e)=
 desugar (FunRecP [] e) = desugar e
 desugar (FunRecP ((var,val):xs)e)=
     App(Lambda var (desugar(FunRecP xs e))) (Fix (Lambda var (desugar val)))
+
+--desugar (FunRecP [(IdP f, e1)] e) = App (Lambda (f) (desugar e)) (Fix (Lambda (f) (desugar e1)))
+--desugar (FunRecP ((IdP f, e1):xs) e) = desugar (FunRecP xs (FunRecP [(IdP f, e1)] e))
+--desugar (FunP [(IdP i, v)] e) = App (Lambda (i) (desugar e)) (desugar v)
+--desugar (FunP ((IdP i, v):xs) e) = App (Lambda (i) (desugar (FunP xs e) )) (desugar v)
+--desugar (LambdaP (IdP i) e) = Lambda (Id i) (desugar e)
+
 desugar (LambdaP [p] body) = Lambda p (desugar body)
 desugar (LambdaP (p:ps) body) = Lambda p (desugar (LambdaP ps body))
 desugar (LambdaP [] _)= error"Lambda sin parametros"
