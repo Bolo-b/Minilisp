@@ -101,12 +101,12 @@ bstep(Pair e1 e2)
 bstep(Fst e)
         | not (esValor e)=Fst(bstep e)
         |otherwise = case e of
-                (Pai v1 v2)-> v1
+                (Pair v1 v2)-> v1
                 Null-> error"No se pudo obtener fst"
 bstep(Snd e)
         | not (esValor e)=Snd(bstep e)
         |otherwise = case e of
-                (Pai v1 v2)-> v2
+                (Pair v1 v2)-> v2
                 Null-> error"No se pudo obtener snd"
 bstep(HeadL e)
         | not (esValor e )= HeadL( bstep e)
