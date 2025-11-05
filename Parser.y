@@ -100,6 +100,7 @@ IdList : id                         { [$1] }
         | IdList id                 { $1 ++ [$2] }
 --Reglas para listas de expresiones
 ExpList : Exp                     { [$1] }
+        | ExpList ',' Exp             { $1 ++ [$3] }
         | ExpList Exp             { $1 ++ [$2] }
 
 ExpList2 : Exp Exp                { [$1, $2] }
