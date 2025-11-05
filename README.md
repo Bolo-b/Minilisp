@@ -23,6 +23,7 @@ Proyecto 1: Lenguajes de programación.
 ### Ejecución:
 `$ ghc -package array Main.hs Menu.hs MiniLisp.hs Interp.hs Desugar.hs Parser.hs Lexer.hs -o minilisp
 `
+
 `$ ./minilisp`
 ### Para el buen funcionamiento de las pruebas se debe tener en cuenta lo siguiente:
 -Cada aplicación de función debe tener ( ) completos
