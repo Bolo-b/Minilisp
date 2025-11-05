@@ -1,5 +1,4 @@
 {
---Modulo para el parser
 module Parser (parse, Exp(..)) where
 import Lexer (lexer, Token(..))
 }
@@ -7,7 +6,7 @@ import Lexer (lexer, Token(..))
 %name parse
 %tokentype { Token }
 %error { parseError }
---Definicion de tokens y el constructor
+
 %token
     int         { TokenInt $$ }
     bool        { TokenBool $$ }
@@ -50,7 +49,7 @@ import Lexer (lexer, Token(..))
     lambda      { TokenLambda }
 
 %%
---Reglas para la expresion
+
 Exp : id                                { IdP $1 }
     | int                               { NumP $1 }
     | bool                              { BoolP $1 }
@@ -85,30 +84,30 @@ Exp : id                                { IdP $1 }
     | '[' ']'        { ListP [] }
     | '(' head Exp ')'                  { HeadLP $3 }
     | '(' tail Exp ')'                  { TailLP $3 }
---Reglas para listas de clausulas
+
 ClausList : '[' Exp Exp ']'               { [($2, $3)] }
           | ClausList '[' Exp Exp ']'     { $1 ++ [($3, $4)] }
---Reglas para bindings
+
 SustBinding: '(' id Exp ')'     { ($2,$3) }
 
 SustList:   SustBinding     { [$1] }
         |   SustList SustBinding    { $1 ++ [$2] }
---Reglas para listas
+
 List : ExpList                        { $1 }
 
 IdList : id                         { [$1] }
         | IdList id                 { $1 ++ [$2] }
---Reglas para listas de expresiones
+
 ExpList : Exp                     { [$1] }
         | ExpList Exp             { $1 ++ [$2] }
 
 ExpList2 : Exp Exp                { [$1, $2] }
         |  ExpList2 Exp           { $1 ++ [$2] }
 {
---Funcion para el manejo de errores de parsing
+
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
---Definicion del arbol de sintaxis abstracta
+
 data Exp = NumP Int
             | BoolP Bool
             | IdP String
